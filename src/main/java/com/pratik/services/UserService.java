@@ -3,7 +3,9 @@ package com.pratik.services;
 import java.util.List;
 import java.util.Optional;
 
+import com.pratik.exception.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.pratik.entity.User;
@@ -15,7 +17,12 @@ public class UserService {
     private UserRepository userRepository;
 
     public List<User> getAllUsers() {
-        return userRepository.findAll();
+        List<User> response = userRepository.findAll();
+        if(response.isEmpty()){
+            throw new NullPointerException("No users found");
+        }
+
+        return response;
     }
 
     public Optional<User> getUserById(Long id) {

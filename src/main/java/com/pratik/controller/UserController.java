@@ -3,7 +3,12 @@ package com.pratik.controller;
 import java.util.List;
 import java.util.Optional;
 
+import com.pratik.dto.SuccessResponse;
+import com.pratik.exception.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,14 +22,29 @@ public class UserController {
     private UserService userService;
 
     @GetMapping
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
+    public ResponseEntity<SuccessResponse> getAllUsers() {
+
+        try {
+            List<User> users = userService.getAllUsers();
+
+            SuccessResponse<User> response = new SuccessResponse<>(true, "Successfully retrieved user", users);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }catch (NullPointerException ex){
+            throw new CustomException(ex.getMessage(), HttpStatus.NOT_FOUND);
+        }
+
+
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+    public ResponseEntity<SuccessResponse<User>> getUserById(@PathVariable Long id) {
         Optional<User> user = userService.getUserById(id);
-        return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+
+        if(user.isEmpty()) {
+            throw new CustomException("User not found", HttpStatus.NOT_FOUND);
+        }
+        SuccessResponse<User> response = new SuccessResponse<>(true, "Successfully retrieved user", user.get());
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping
