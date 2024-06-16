@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import com.pratik.dto.SuccessResponse;
 import com.pratik.exception.CustomException;
+import com.pratik.services.PriceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -22,10 +23,16 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private PriceService price;
+
+
+
     @GetMapping
     public ResponseEntity<SuccessResponse> getAllUsers() {
 
         try {
+            price.getCurrentPrice();
             List<User> users = userService.getAllUsers();
 
             SuccessResponse<User> response = new SuccessResponse<>(true, "Successfully retrieved user", users);
