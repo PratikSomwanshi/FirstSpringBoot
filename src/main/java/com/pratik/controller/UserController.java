@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.pratik.entity.User;
 import com.pratik.services.UserService;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/users")
@@ -37,7 +38,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SuccessResponse<User>> getUserById(@PathVariable Long id) {
+    public ResponseEntity<SuccessResponse> getUserById(@PathVariable Long id) {
         Optional<User> user = userService.getUserById(id);
 
         if(user.isEmpty()) {
@@ -45,6 +46,11 @@ public class UserController {
         }
         SuccessResponse<User> response = new SuccessResponse<>(true, "Successfully retrieved user", user.get());
         return new ResponseEntity<>(response, HttpStatus.OK);
+
+
+//        return user.orElseThrow(() -> new CustomException("User not found", HttpStatus.NOT_FOUND));
+
+
     }
 
     @PostMapping
